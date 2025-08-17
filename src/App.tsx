@@ -6,16 +6,22 @@ import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './hooks/useAuth';
 import theme from './theme/theme';
 
-// Pages
+// Layout
+import Layout from './components/Layout/Layout';
+
+// Pages (existing, kept)
 import EmailVerification from './pages/EmailVerification/EmailVerification';
 import Registration from './pages/Registration/Registration';
 import ConfirmRegistration from './pages/Registration/ConfirmRegistration';
 import Login from './pages/Login/Login';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import SetPassword from './pages/SetPassword/SetPassword';
+
+// New/Re-created Pages
 import Dashboard from './pages/Dashboard/Dashboard';
-import ChildMode from './pages/ChildMode/ChildMode';
-import Chat from './pages/Chat/Chat';
+import KidsPage from './pages/Kids/KidsPage';
+import ProfilePage from './pages/Profile/ProfilePage';
+
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -25,7 +31,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     return <div>Loading...</div>;
   }
   
-  return user ? <>{children}</> : <Navigate to="/" replace />;
+  return user ? <Layout>{children}</Layout> : <Navigate to="/login" replace />;
 };
 
 function App() {
@@ -53,24 +59,24 @@ function App() {
               } 
             />
             <Route 
-              path="/child/:kidId" 
+              path="/kids" 
               element={
                 <ProtectedRoute>
-                  <ChildMode />
+                  <KidsPage />
                 </ProtectedRoute>
               } 
             />
             <Route 
-              path="/chat/:kidId" 
+              path="/profile" 
               element={
                 <ProtectedRoute>
-                  <Chat />
+                  <ProfilePage />
                 </ProtectedRoute>
               } 
             />
             
-            {/* Redirect any unknown routes to home */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Redirect any unknown routes to login if not authenticated, or dashboard if authenticated */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </Router>
       </AuthProvider>
