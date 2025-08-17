@@ -21,7 +21,6 @@ import {
 import {
   Add as AddIcon,
   Person as PersonIcon,
-  School as SchoolIcon,
   Quiz as QuizIcon,
   Chat as ChatIcon,
   Assessment as AssessmentIcon,
@@ -33,11 +32,11 @@ import { styled } from '@mui/material/styles';
 import Layout from '../../components/Layout/Layout';
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
 import Mascot from '../../components/Mascot/Mascot';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { kidsAPI } from '../../services/api';
 import { GetKidResponse, KidRequest } from '../../types/api';
 
-const DashboardPaper = styled(Paper)(({ theme }) => ({
+const DashboardPaper = styled(Paper)(() => ({
   padding: theme.spacing(3),
   borderRadius: '20px',
   background: 'rgba(255, 255, 255, 0.95)',
@@ -46,7 +45,7 @@ const DashboardPaper = styled(Paper)(({ theme }) => ({
   height: '100%',
 }));
 
-const KidCard = styled(Card)(({ theme }) => ({
+const KidCard = styled(Card)(() => ({
   borderRadius: '15px',
   background: 'linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)',
   cursor: 'pointer',
@@ -57,7 +56,7 @@ const KidCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-const ActionCard = styled(Card)(({ theme }) => ({
+const ActionCard = styled(Card)(() => ({
   borderRadius: '15px',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
@@ -69,7 +68,7 @@ const ActionCard = styled(Card)(({ theme }) => ({
 }));
 
 const Dashboard: React.FC = () => {
-  const { user, logout, isChildMode, setChildMode } = useAuth();
+  const { user, logout, setChildMode } = useAuth();
   const navigate = useNavigate();
   const [kids, setKids] = useState<GetKidResponse[]>([]);
   const [loading, setLoading] = useState(true);
@@ -115,7 +114,7 @@ const Dashboard: React.FC = () => {
         standard: '',
       });
       fetchKids();
-    } catch (error: any) {
+    } catch (error: { response: { data: { message: string } } }) {
       setError(error.response?.data?.message || 'Failed to add kid');
     } finally {
       setAddingKid(false);

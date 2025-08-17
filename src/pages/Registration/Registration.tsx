@@ -1,29 +1,77 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  Box,
   Paper,
   TextField,
   Typography,
   Alert,
   CircularProgress,
+  Box,
   MenuItem,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { styled } from '@mui/material/styles';
-import Layout from '../../components/Layout/Layout';
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
-import Mascot from '../../components/Mascot/Mascot';
 import { authAPI } from '../../services/api';
+import ChatBotTutorImg from '../../assets/ChatBotTutor.png';
+
+const FullScreenRoot = styled('div')(({ theme }) => ({
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  width: '100vw',
+  height: '100vh',
+  background: 'linear-gradient(90deg, #23a5ff 0%, #12193D 100%)',
+  zIndex: 9999,
+  display: 'flex',
+  flexDirection: 'row',
+  overflow: 'hidden',
+  [theme.breakpoints.down('sm')]: {
+    flexDirection: 'column',
+    height: '100vh',
+  },
+}));
+
+const LeftSide = styled('div')(({ theme }) => ({
+  flex: 1,
+  height: '100vh',
+  backgroundImage: `url(${ChatBotTutorImg})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  [theme.breakpoints.down('sm')]: {
+    width: '100vw',
+    height: '40vh',
+    borderRadius: 0,
+  },
+}));
+
+const RightSide = styled('div')(({ theme }) => ({
+  flex: 1,
+  height: '100vh',
+  background: 'rgba(18,25,61,0.97)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  [theme.breakpoints.down('sm')]: {
+    width: '100vw',
+    height: '60vh',
+    borderRadius: 0,
+    alignItems: 'flex-start',
+    paddingTop: theme.spacing(5),
+  },
+}));
 
 const FormPaper = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(4),
-  borderRadius: '20px',
-  background: 'rgba(255, 255, 255, 0.95)',
-  backdropFilter: 'blur(10px)',
-  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+  width: '100%',
   maxWidth: 500,
-  margin: '0 auto',
+  padding: theme.spacing(5, 4),
+  borderRadius: 32,
+  background: 'rgba(18,25,61, 0.98)',
+  boxShadow: '0 8px 45px rgba(23,165,255,0.22)',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
 }));
 
 const Registration: React.FC = () => {
@@ -49,11 +97,10 @@ const Registration: React.FC = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       await authAPI.sendVerification(formData);
       setSuccess(true);
@@ -67,119 +114,93 @@ const Registration: React.FC = () => {
     }
   };
 
+  // Success state
   if (success) {
     return (
-      <Layout>
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          minHeight="80vh"
-          gap={4}
-        >
+      <FullScreenRoot>
+        <LeftSide />
+        <RightSide>
           <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.6, type: "spring" }}
-          >
-            <Mascot 
-              message="Awesome! Check your email!" 
-              emotion="celebrating"
-              size="large"
-            />
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.7 }}
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              margin: 0,
+            }}
           >
-            <FormPaper elevation={0}>
+            <FormPaper elevation={6}>
               <Typography
                 variant="h4"
                 component="h1"
-                gutterBottom
-                textAlign="center"
+                align="center"
                 color="primary"
                 fontWeight="bold"
+                sx={{ mb: 2, mt: 2, fontSize: '2rem' }}
               >
                 Registration Successful! 🎉
               </Typography>
-              
               <Typography
                 variant="body1"
-                textAlign="center"
+                align="center"
                 color="text.secondary"
-                mb={3}
+                sx={{ mb: 3 }}
               >
                 We've sent a verification email to {formData.email}. 
                 Please check your inbox and follow the instructions to complete your registration.
               </Typography>
-              
               <Typography
                 variant="body2"
-                textAlign="center"
+                align="center"
                 color="text.secondary"
               >
                 Redirecting to login page...
               </Typography>
             </FormPaper>
           </motion.div>
-        </Box>
-      </Layout>
+        </RightSide>
+      </FullScreenRoot>
     );
   }
 
+  // Form
   return (
-    <Layout>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        minHeight="80vh"
-        gap={4}
-      >
+    <FullScreenRoot>
+      <LeftSide />
+      <RightSide>
         <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 0.6, type: "spring" }}
-        >
-          <Mascot 
-            message="Let's create your account!" 
-            emotion="excited"
-            size="large"
-          />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.7 }}
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            margin: 0,
+          }}
         >
-          <FormPaper elevation={0}>
+          <FormPaper elevation={6}>
             <Typography
               variant="h4"
               component="h1"
-              gutterBottom
-              textAlign="center"
+              align="center"
               color="primary"
               fontWeight="bold"
+              sx={{ mb: 2, mt: 2, fontSize: '2rem' }}
             >
               Create Your Account 🚀
             </Typography>
-            
             <Typography
               variant="body1"
-              textAlign="center"
+              align="center"
               color="text.secondary"
-              mb={3}
+              sx={{ mb: 3 }}
             >
               Fill in your details to join the ChatTutor family!
             </Typography>
-
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{ width: '100%' }}>
               <TextField
                 fullWidth
                 label="Full Name"
@@ -190,7 +211,6 @@ const Registration: React.FC = () => {
                 variant="outlined"
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
               />
-
               <TextField
                 fullWidth
                 label="Email Address"
@@ -203,7 +223,6 @@ const Registration: React.FC = () => {
                 disabled={!!prefilledEmail}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
               />
-
               <TextField
                 fullWidth
                 select
@@ -218,7 +237,6 @@ const Registration: React.FC = () => {
                 <MenuItem value="MALE">Male</MenuItem>
                 <MenuItem value="FEMALE">Female</MenuItem>
               </TextField>
-
               <TextField
                 fullWidth
                 label="Phone Number"
@@ -229,13 +247,11 @@ const Registration: React.FC = () => {
                 variant="outlined"
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
               />
-
               {error && (
                 <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>
                   {error}
                 </Alert>
               )}
-
               <Box mt={3}>
                 <AnimatedButton
                   type="submit"
@@ -254,8 +270,8 @@ const Registration: React.FC = () => {
             </form>
           </FormPaper>
         </motion.div>
-      </Box>
-    </Layout>
+      </RightSide>
+    </FullScreenRoot>
   );
 };
 

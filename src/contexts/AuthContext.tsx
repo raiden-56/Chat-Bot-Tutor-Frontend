@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI } from '../services/api';
 import { UserInfoResponse } from '../types/api';
 
@@ -12,15 +12,7 @@ interface AuthContextType {
   setChildMode: (mode: boolean) => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -38,7 +30,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         try {
           const response = await authAPI.getUserInfo();
           setUser(response.data.data);
-        } catch (error) {
+        } catch {
           localStorage.removeItem('authToken');
           setToken(null);
         }
@@ -50,18 +42,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [token]);
 
   const login = async (email: string, password: string) => {
-    try {
-      const response = await authAPI.login({ email, password });
-      const newToken = response.data.data.token;
-      
-      localStorage.setItem('authToken', newToken);
-      setToken(newToken);
-      
-      const userResponse = await authAPI.getUserInfo();
-      setUser(userResponse.data.data);
-    } catch (error) {
-      throw error;
-    }
+    const response = await authAPI.login({ email, password });
+    const newToken = response.data.data.token;
+    
+    localStorage.setItem('authToken', newToken);
+    setToken(newToken);
+    
+    const userResponse = await authAPI.getUserInfo();
+    setUser(userResponse.data.data);
   };
 
   const logout = () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -20,11 +20,11 @@ import { styled } from '@mui/material/styles';
 import Layout from '../../components/Layout/Layout';
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
 import Mascot from '../../components/Mascot/Mascot';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../hooks/useAuth';
 import { kidsAPI } from '../../services/api';
 import { GetKidResponse } from '../../types/api';
 
-const ChildPaper = styled(Paper)(({ theme }) => ({
+const ChildPaper = styled(Paper)(() => ({
   padding: theme.spacing(4),
   borderRadius: '25px',
   background: 'rgba(255, 255, 255, 0.95)',
@@ -33,7 +33,7 @@ const ChildPaper = styled(Paper)(({ theme }) => ({
   textAlign: 'center',
 }));
 
-const ActivityCard = styled(Card)(({ theme }) => ({
+const ActivityCard = styled(Card)(() => ({
   borderRadius: '20px',
   cursor: 'pointer',
   transition: 'all 0.3s ease',
@@ -54,13 +54,7 @@ const ChildMode: React.FC = () => {
   const [kid, setKid] = useState<GetKidResponse | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (kidId) {
-      fetchKid(parseInt(kidId));
-    }
-  }, [kidId]);
-
-  const fetchKid = async (id: number) => {
+  const fetchKid = useCallback(async (id: number) => {
     try {
       const response = await kidsAPI.getKidById(id);
       setKid(response.data.data);
@@ -70,7 +64,13 @@ const ChildMode: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (kidId) {
+      fetchKid(parseInt(kidId));
+    }
+  }, [kidId, fetchKid]);
 
   const handleLogout = () => {
     setChildMode(false);

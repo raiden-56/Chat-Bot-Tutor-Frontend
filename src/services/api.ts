@@ -11,7 +11,8 @@ import {
   GetQuestionsHistoryResponse,
   ApiResponse,
   GetApiResponse,
-  UserInfoResponse
+  UserInfoResponse,
+  SuccessResponse
 } from '../types/api';
 
 const API_BASE_URL = 'http://localhost:8000'; // Update this to your backend URL
@@ -37,16 +38,16 @@ export const authAPI = {
     api.post<ApiResponse<LoginResponse>>('/login', data),
   
   verifyEmail: (email: string) => 
-    api.get<ApiResponse<any>>(`/users/verify-email?email=${email}`),
+    api.get<ApiResponse<SuccessResponse>>(`/users/verify-email?email=${email}`),
   
   sendVerification: (data: RegisterUserRequest) => 
-    api.post<ApiResponse<any>>('/users/send-verification', data),
+    api.post<ApiResponse<SuccessResponse>>('/users/send-verification', data),
   
   forgotPassword: (data: ForgotPasswordRequest) => 
-    api.post<ApiResponse<any>>('/users/forgot-password', data),
+    api.post<ApiResponse<SuccessResponse>>('/users/forgot-password', data),
   
   setPassword: (data: SetPasswordRequest) => 
-    api.post<ApiResponse<any>>('/users/set-password', data),
+    api.post<ApiResponse<SuccessResponse>>('/users/set-password', data),
   
   getUserInfo: () => 
     api.get<ApiResponse<UserInfoResponse>>('/users/info'),
@@ -54,7 +55,7 @@ export const authAPI = {
 
 export const kidsAPI = {
   createKid: (data: KidRequest) => 
-    api.post<ApiResponse<any>>('/kids', data),
+    api.post<ApiResponse<SuccessResponse>>('/kids', data),
   
   getAllKids: () => 
     api.get<GetApiResponse<GetKidResponse[]>>('/kids'),
@@ -63,13 +64,13 @@ export const kidsAPI = {
     api.get<ApiResponse<GetKidResponse>>(`/kids/${kidId}`),
   
   updateKid: (kidId: number, data: KidRequest) => 
-    api.put<ApiResponse<any>>(`/kids/${kidId}`, data),
+    api.put<ApiResponse<SuccessResponse>>(`/kids/${kidId}`, data),
   
   deleteKid: (kidId: number) => 
-    api.delete<ApiResponse<any>>(`/kids/${kidId}`),
+    api.delete<ApiResponse<SuccessResponse>>(`/kids/${kidId}`),
   
   createQuestion: (kidId: number, data: QuestionRequest) => 
-    api.post<ApiResponse<any>>(`/kids/${kidId}/questions`, data),
+    api.post<ApiResponse<SuccessResponse>>(`/kids/${kidId}/questions`, data),
   
   getQuestionsHistory: (kidId: number) => 
     api.get<ApiResponse<GetQuestionsHistoryResponse[]>>(`/kids/${kidId}/questions-history`),

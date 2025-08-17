@@ -2,7 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
+import { useAuth } from './hooks/useAuth';
 import theme from './theme/theme';
 
 // Pages
@@ -13,6 +14,7 @@ import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import SetPassword from './pages/SetPassword/SetPassword';
 import Dashboard from './pages/Dashboard/Dashboard';
 import ChildMode from './pages/ChildMode/ChildMode';
+import Chat from './pages/Chat/Chat';
 
 // Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -53,6 +55,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ChildMode />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/chat/:kidId" 
+              element={
+                <ProtectedRoute>
+                  <Chat />
                 </ProtectedRoute>
               } 
             />

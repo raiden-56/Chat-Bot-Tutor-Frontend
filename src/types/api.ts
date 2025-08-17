@@ -1,4 +1,3 @@
-// API Types based on the OpenAPI specification
 export interface LoginRequest {
   email: string;
   password: string;
@@ -40,10 +39,6 @@ export interface GetKidResponse {
   gender: string;
   school: string;
   standard: string;
-  created_at: string;
-  created_by: string;
-  updated_at: string;
-  updated_by: string;
 }
 
 export interface QuestionRequest {
@@ -51,23 +46,19 @@ export interface QuestionRequest {
 }
 
 export interface GetQuestionsHistoryResponse {
-  id: string;
+  id: number;
   question: string;
   answer: string;
-  subject: string;
   created_at: string;
 }
 
 export interface ApiResponse<T> {
-  status_message: string;
   data: T;
+  message: string;
+  success: boolean;
 }
 
 export interface GetApiResponse<T> {
-  status_message: string;
-  page?: number;
-  page_size?: number;
-  total_items?: number;
   data: T;
 }
 
@@ -75,5 +66,9 @@ export interface UserInfoResponse {
   id: number;
   name: string;
   email: string;
-  role: string;
+}
+
+export interface SuccessResponse {
+  message: string;
+  success: boolean;
 }

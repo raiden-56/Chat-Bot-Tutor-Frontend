@@ -3,14 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const MascotContainer = styled(Box)(({ theme }) => ({
+const MascotContainer = styled(Box)({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-}));
+});
 
+// FIXED: We get theme as argument!
 const MascotBody = styled(motion.div)(({ theme }) => ({
   width: 120,
   height: 120,
@@ -21,7 +22,7 @@ const MascotBody = styled(motion.div)(({ theme }) => ({
   boxShadow: `0 8px 32px ${theme.palette.primary.light}`,
 }));
 
-const MascotEye = styled(motion.div)(({ theme }) => ({
+const MascotEye = styled(motion.div)({
   width: 20,
   height: 20,
   borderRadius: '50%',
@@ -38,8 +39,9 @@ const MascotEye = styled(motion.div)(({ theme }) => ({
     top: 6,
     left: 6,
   },
-}));
+});
 
+// FIXED: Passes theme as argument
 const MascotMouth = styled(motion.div)(({ theme }) => ({
   width: 30,
   height: 15,
@@ -51,6 +53,7 @@ const MascotMouth = styled(motion.div)(({ theme }) => ({
   transform: 'translateX(-50%)',
 }));
 
+// FIXED: Passes theme as argument
 const SpeechBubble = styled(motion.div)(({ theme }) => ({
   position: 'absolute',
   top: -60,
