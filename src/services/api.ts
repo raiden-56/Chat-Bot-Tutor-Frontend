@@ -16,6 +16,7 @@ import {
   GetUserDetailsResponse,
   UpdateUserRequest,
   UserResponse,
+  ConfirmRegistrationRequest
 } from '../types/api';
 
 const API_BASE_URL = 'http://localhost:8000'; // Update this to your backend URL
@@ -47,6 +48,9 @@ export const authAPI = {
   sendVerification: (data: RegisterUserRequest) =>
     api.post<ApiResponse<SuccessMessageResponse>>('/users/send-verification', data),
 
+  createUser: (data: ConfirmRegistrationRequest) =>
+    api.post<ApiResponse<UserResponse>>('/users', data),
+  
   forgotPassword: (data: ForgotPasswordRequest) =>
     api.post<ApiResponse<UserResponse>>('/users/forgot-password', data),
 
@@ -59,9 +63,6 @@ export const authAPI = {
 
 /* ---------------- PROTECTED USER MANAGEMENT ---------------- */
 export const usersAPI = {
-  createUser: (password: string) =>
-    api.post<ApiResponse<UserResponse>>(`/users?password=${password}`),
-
   getAllUsers: (params?: {
     search?: string;
     filter_by?: string;

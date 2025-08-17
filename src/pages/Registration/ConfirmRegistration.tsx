@@ -12,7 +12,7 @@ import { motion } from 'framer-motion';
 import { styled } from '@mui/material/styles';
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
 import ChatBotTutorImg from '../../assets/ChatBotTutor.png';
-import { usersAPI } from '../../services/api';   // ✅ use usersAPI instead of raw axios
+import { authAPI } from '../../services/api';  
 
 
 /* ---------------- REMOVE SCROLL WHEN LOADING THE PAGE ---------------- */
@@ -139,11 +139,12 @@ const ConfirmRegistration: React.FC = () => {
 
     setLoading(true);
     setError('');
-
+    
     try {
-      // ✅ Call createUser API
-      await usersAPI.createUser(formData.password);
-
+      await authAPI.createUser({
+        password: formData.password,
+        token: tokenParam,
+      });
       setSuccess(true);
       setTimeout(() => {
         navigate('/login', { state: { email: emailParam } });

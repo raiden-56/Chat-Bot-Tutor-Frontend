@@ -17,6 +17,11 @@ export interface RegisterUserRequest {
   phone_number: string;
 }
 
+export interface ConfirmRegistrationRequest{
+  password: string;
+  token: string;
+}
+
 export interface ForgotPasswordRequest {
   email: string;
 }
