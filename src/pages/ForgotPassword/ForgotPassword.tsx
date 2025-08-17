@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Box,
   Paper,
   TextField,
   Typography,
   Alert,
   CircularProgress,
+  Box,
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import { styled } from '@mui/material/styles';
-
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
 import { authAPI } from '../../services/api';
-
 import ChatBotTutorImg from '../../assets/ChatBotTutor.png';
 
 const useNoScroll = () => {
@@ -29,67 +27,63 @@ const useNoScroll = () => {
   }, []);
 };
 
-const Root = styled(Box)(({ theme }) => ({
-  width: '100vw',
-  height: '100vh',
-  display: 'flex',
-  background: 'linear-gradient(90deg, #23a5ff 0%, #12193D 100%)',
+const FullScreenRoot = styled('div')(({ theme }) => ({
   position: 'fixed',
   top: 0,
   left: 0,
-  zIndex: 1000,
+  width: '100vw',
+  height: '100vh',
+  background: 'linear-gradient(90deg, #23a5ff 0%, #12193D 100%)',
+  zIndex: 9999,
+  display: 'flex',
+  flexDirection: 'row',
+  overflow: 'hidden',
   [theme.breakpoints.down('sm')]: {
     flexDirection: 'column',
     height: '100vh',
-    minHeight: '100vh',
   },
 }));
 
-const LeftSide = styled(Box)(({ theme }) => ({
+const LeftSide = styled('div')(({ theme }) => ({
   flex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  height: '100vh',
   backgroundImage: `url(${ChatBotTutorImg})`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
-  minHeight: '100vh',
-  height: '100vh',
-  borderRadius: 0,
   [theme.breakpoints.down('sm')]: {
-    minHeight: '40vh',
+    width: '100vw',
     height: '40vh',
+    borderRadius: 0,
   },
 }));
 
-const RightSide = styled(Box)(({ theme }) => ({
+const RightSide = styled('div')(({ theme }) => ({
   flex: 1,
+  height: '100vh',
+  background: 'rgba(18,25,61,0.97)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: '100vh',
-  height: '100vh',
-  background: 'rgba(18,25,61, 0.97)',
-  borderRadius: 0,
   [theme.breakpoints.down('sm')]: {
-    minHeight: '60vh',
+    width: '100vw',
     height: '60vh',
-    padding: theme.spacing(3, 0),
+    borderRadius: 0,
+    alignItems: 'flex-start',
+    paddingTop: theme.spacing(5),
   },
 }));
 
 const FormPaper = styled(Paper)(({ theme }) => ({
   width: '100%',
-  maxWidth: 400,
+  maxWidth: 420,
   padding: theme.spacing(5, 4),
-  borderRadius: 24,
-  background: 'rgba(18,25,61, 0.99)',
-  boxShadow: '0 8px 40px rgba(23, 165, 255, 0.16)',
+  borderRadius: 32,
+  background: 'rgba(18,25,61, 0.98)',
+  boxShadow: '0 8px 45px rgba(23,165,255,0.22)',
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  margin: 0,
 }));
 
 const BackLink = styled(Link)(({ theme }) => ({
@@ -112,7 +106,6 @@ const ForgotPassword: React.FC = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       await authAPI.forgotPassword({ email });
       setSuccess(true);
@@ -124,7 +117,7 @@ const ForgotPassword: React.FC = () => {
   };
 
   return (
-    <Root>
+    <FullScreenRoot>
       <LeftSide />
       <RightSide>
         <motion.div
@@ -133,7 +126,7 @@ const ForgotPassword: React.FC = () => {
           transition={{ duration: 0.7 }}
           style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: 0 }}
         >
-          <FormPaper elevation={4}>
+          <FormPaper elevation={6}>
             {success ? (
               <>
                 <Typography
@@ -244,7 +237,7 @@ const ForgotPassword: React.FC = () => {
           </FormPaper>
         </motion.div>
       </RightSide>
-    </Root>
+    </FullScreenRoot>
   );
 };
 
