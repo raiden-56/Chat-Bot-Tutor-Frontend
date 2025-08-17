@@ -34,7 +34,7 @@ const FullScreenRoot = styled('div')(({ theme }) => ({
 
 const LeftSide = styled('div')(({ theme }) => ({
   flex: 1,
-  height: '100vh',
+  height: '100%',
   backgroundImage: `url(${ChatBotTutorImg})`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
@@ -48,7 +48,7 @@ const LeftSide = styled('div')(({ theme }) => ({
 
 const RightSide = styled('div')(({ theme }) => ({
   flex: 1,
-  height: '100vh',
+  height: '100%',
   background: 'rgba(18,25,61,0.97)',
   display: 'flex',
   alignItems: 'center',
@@ -74,12 +74,20 @@ const FormPaper = styled(Paper)(({ theme }) => ({
   alignItems: 'center',
 }));
 
+interface FormData {
+  name: string;
+  email: string;
+  gender: string;
+  role: string;
+  phone_number: string;
+}
+
 const Registration: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const prefilledEmail = location.state?.email || '';
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: prefilledEmail,
     gender: '',
@@ -90,13 +98,16 @@ const Registration: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: e.target.value
-    }));
-  };
+  // Fix: add types for both parameters
+  const handleChange = (field: keyof FormData) => 
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setFormData(prev => ({
+        ...prev,
+        [field]: e.target.value
+      }));
+    };
 
+  // Fix: add type for parameter
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -107,14 +118,15 @@ const Registration: React.FC = () => {
       setTimeout(() => {
         navigate('/login', { state: { email: formData.email } });
       }, 3000);
-    } catch (error: any) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (error: unknown) {
+      // Fix: Type assertion for error
+      const errMsg = (error as any)?.response?.data?.message || 'Registration failed. Please try again.';
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
   };
 
-  // Success state
   if (success) {
     return (
       <FullScreenRoot>
@@ -165,7 +177,6 @@ const Registration: React.FC = () => {
     );
   }
 
-  // Form
   return (
     <FullScreenRoot>
       <LeftSide />
@@ -200,7 +211,7 @@ const Registration: React.FC = () => {
             >
               Fill in your details to join the ChatTutor family!
             </Typography>
-            <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+            <form onSubmit={handleSubmit} style={{ width: '100%' }} autoComplete="off">
               <TextField
                 fullWidth
                 label="Full Name"
@@ -232,6 +243,9 @@ const Registration: React.FC = () => {
                 margin="normal"
                 required
                 variant="outlined"
+                SelectProps={{
+                  MenuProps: { disablePortal: true }
+                }}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
               >
                 <MenuItem value="MALE">Male</MenuItem>
@@ -245,6 +259,7 @@ const Registration: React.FC = () => {
                 margin="normal"
                 required
                 variant="outlined"
+                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 15 }}
                 sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
               />
               {error && (
