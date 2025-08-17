@@ -1,3 +1,5 @@
+/* ---------- AUTH TYPES ---------- */
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -20,9 +22,11 @@ export interface ForgotPasswordRequest {
 }
 
 export interface SetPasswordRequest {
-  invitation_token: string;
-  password: string;
+  invitation_token: string; // min length: 36
+  password: string; // 8 - 16 chars
 }
+
+/* ---------- KIDS TYPES ---------- */
 
 export interface KidRequest {
   name: string;
@@ -39,6 +43,10 @@ export interface GetKidResponse {
   gender: string;
   school: string;
   standard: string;
+  created_at: string;
+  created_by: string;
+  updated_at: string;
+  updated_by: string;
 }
 
 export interface QuestionRequest {
@@ -46,29 +54,80 @@ export interface QuestionRequest {
 }
 
 export interface GetQuestionsHistoryResponse {
-  id: number;
+  id: string;
   question: string;
   answer: string;
-  created_at: string;
+  subject: string;
+  created_at: string; // ISO datetime
 }
 
-export interface ApiResponse<T> {
-  data: T;
-  message: string;
-  success: boolean;
-}
-
-export interface GetApiResponse<T> {
-  data: T;
-}
+/* ---------- USER TYPES ---------- */
 
 export interface UserInfoResponse {
   id: number;
   name: string;
   email: string;
+  role: string;
 }
 
-export interface SuccessResponse {
+export interface UpdateUserRequest {
+  name: string;
+  gender: string;
+  role: string;
+  phone_number: string;
+  is_active?: boolean | null;
+}
+
+export interface UserResponse {
+  id?: number | null;
   message: string;
-  success: boolean;
+}
+
+export interface GetUserDetailsResponse {
+  id: number;
+  name: string;
+  email: string;
+  gender: string;
+  phone_number: string;
+  role: string;
+  created_at: string;
+  created_by?: string | null;
+  updated_at: string;
+  updated_by?: string | null;
+  is_active: boolean;
+}
+
+/* ---------- GENERIC RESPONSES ---------- */
+
+// Generic API response wrapper
+export interface ApiResponse<T> {
+  status_message: string; // usually "SUCCESS"
+  data: T;
+}
+
+// API response with pagination
+export interface GetApiResponse<T> {
+  status_message: string;
+  page?: number | null;
+  page_size?: number | null;
+  total_items?: number | null;
+  data: T;
+}
+
+// A standard success message response
+export interface SuccessMessageResponse {
+  id?: number | null;
+  message: string;
+}
+
+/* ---------- VALIDATION ERRORS ---------- */
+
+export interface ValidationError {
+  loc: (string | number)[];
+  msg: string;
+  type: string;
+}
+
+export interface HTTPValidationError {
+  detail?: ValidationError[];
 }

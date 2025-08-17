@@ -9,6 +9,7 @@ import theme from './theme/theme';
 // Pages
 import EmailVerification from './pages/EmailVerification/EmailVerification';
 import Registration from './pages/Registration/Registration';
+import ConfirmRegistration from './pages/Registration/ConfirmRegistration';
 import Login from './pages/Login/Login';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import SetPassword from './pages/SetPassword/SetPassword';
@@ -37,6 +38,7 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<EmailVerification />} />
             <Route path="/registration" element={<Registration />} />
+            <Route path="/confirm-registration" element={<ConfirmRegistration />} />
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/set-password" element={<SetPassword />} />

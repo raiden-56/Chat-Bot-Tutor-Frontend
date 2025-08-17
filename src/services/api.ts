@@ -12,7 +12,10 @@ import {
   ApiResponse,
   GetApiResponse,
   UserInfoResponse,
-  SuccessResponse
+  SuccessMessageResponse,
+  GetUserDetailsResponse,
+  UpdateUserRequest,
+  UserResponse,
 } from '../types/api';
 
 const API_BASE_URL = 'http://localhost:8000'; // Update this to your backend URL
@@ -33,47 +36,82 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+/* ---------------- AUTH & PUBLIC USER SERVICE ---------------- */
 export const authAPI = {
-  login: (data: LoginRequest) => 
+  login: (data: LoginRequest) =>
     api.post<ApiResponse<LoginResponse>>('/login', data),
-  
-  verifyEmail: (email: string) => 
-    api.get<ApiResponse<SuccessResponse>>(`/users/verify-email?email=${email}`),
-  
-  sendVerification: (data: RegisterUserRequest) => 
-    api.post<ApiResponse<SuccessResponse>>('/users/send-verification', data),
-  
-  forgotPassword: (data: ForgotPasswordRequest) => 
-    api.post<ApiResponse<SuccessResponse>>('/users/forgot-password', data),
-  
-  setPassword: (data: SetPasswordRequest) => 
-    api.post<ApiResponse<SuccessResponse>>('/users/set-password', data),
-  
-  getUserInfo: () => 
+
+  verifyEmail: (email: string) =>
+    api.get<ApiResponse<UserResponse>>(`/users/verify-email?email=${email}`),
+
+  sendVerification: (data: RegisterUserRequest) =>
+    api.post<ApiResponse<SuccessMessageResponse>>('/users/send-verification', data),
+
+  forgotPassword: (data: ForgotPasswordRequest) =>
+    api.post<ApiResponse<UserResponse>>('/users/forgot-password', data),
+
+  setPassword: (data: SetPasswordRequest) =>
+    api.post<ApiResponse<UserResponse>>('/users/set-password', data),
+
+  getUserInfo: () =>
     api.get<ApiResponse<UserInfoResponse>>('/users/info'),
 };
 
+/* ---------------- PROTECTED USER MANAGEMENT ---------------- */
+export const usersAPI = {
+  createUser: (password: string) =>
+    api.post<ApiResponse<UserResponse>>(`/users?password=${password}`),
+
+  getAllUsers: (params?: {
+    search?: string;
+    filter_by?: string;
+    filter_values?: string;
+    sort_by?: string;
+    order_by?: 'asc' | 'desc';
+    page?: number;
+    page_size?: number;
+  }) =>
+    api.get<GetApiResponse<GetUserDetailsResponse[]>>('/users', { params }),
+
+  getUserById: (userId: number) =>
+    api.get<ApiResponse<GetUserDetailsResponse>>(`/users/data/${userId}`),
+
+  updateUserById: (userId: number, data: UpdateUserRequest) =>
+    api.put<ApiResponse<UserResponse>>(`/users/data/${userId}`, data),
+};
+
+/* ---------------- KIDS MANAGEMENT ---------------- */
 export const kidsAPI = {
-  createKid: (data: KidRequest) => 
-    api.post<ApiResponse<SuccessResponse>>('/kids', data),
-  
-  getAllKids: () => 
-    api.get<GetApiResponse<GetKidResponse[]>>('/kids'),
-  
-  getKidById: (kidId: number) => 
+  createKid: (data: KidRequest) =>
+    api.post<ApiResponse<SuccessMessageResponse>>('/kids', data),
+
+  getAllKids: (params?: {
+    search?: string;
+    filter_by?: string;
+    filter_values?: string;
+    sort_by?: string;
+    order_by?: 'asc' | 'desc';
+    page?: number;
+    page_size?: number;
+  }) =>
+    api.get<GetApiResponse<GetKidResponse[]>>('/kids', { params }),
+
+  getKidById: (kidId: number) =>
     api.get<ApiResponse<GetKidResponse>>(`/kids/${kidId}`),
-  
-  updateKid: (kidId: number, data: KidRequest) => 
-    api.put<ApiResponse<SuccessResponse>>(`/kids/${kidId}`, data),
-  
-  deleteKid: (kidId: number) => 
-    api.delete<ApiResponse<SuccessResponse>>(`/kids/${kidId}`),
-  
-  createQuestion: (kidId: number, data: QuestionRequest) => 
-    api.post<ApiResponse<SuccessResponse>>(`/kids/${kidId}/questions`, data),
-  
-  getQuestionsHistory: (kidId: number) => 
-    api.get<ApiResponse<GetQuestionsHistoryResponse[]>>(`/kids/${kidId}/questions-history`),
+
+  updateKid: (kidId: number, data: KidRequest) =>
+    api.put<ApiResponse<SuccessMessageResponse>>(`/kids/${kidId}`, data),
+
+  deleteKid: (kidId: number) =>
+    api.delete<ApiResponse<SuccessMessageResponse>>(`/kids/${kidId}`),
+
+  createQuestion: (kidId: number, data: QuestionRequest) =>
+    api.post<ApiResponse<SuccessMessageResponse>>(`/kids/${kidId}/questions`, data),
+
+  getQuestionsHistory: (kidId: number) =>
+    api.get<ApiResponse<GetQuestionsHistoryResponse[]>>(
+      `/kids/${kidId}/questions-history`
+    ),
 };
 
 export default api;
