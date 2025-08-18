@@ -61,10 +61,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <Box sx={{ p: 2, background: 'linear-gradient(135deg, #1976d2, #42a5f5)' }}>
+      <Box sx={{ p: 2, background: '#2196F3' }}>
         <Box className="flex items-center justify-between">
           <Box className="flex items-center space-x-3">
-            <VirtualCharacter size="sm" animation="idle" />
             <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
               Chatbot Tutor
             </Typography>
@@ -93,11 +92,11 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     if (isMobile) setMobileOpen(false);
                   }}
                   sx={{
-                    borderRadius: '12px',
+                    borderRadius: '8px',
                     backgroundColor: location.pathname === item.path ? 'primary.main' : 'transparent',
-                    color: location.pathname === item.path ? 'primary.contrastText' : 'text.primary',
+                    color: location.pathname === item.path ? '#FFFFFF' : '#212121',
                     '&:hover': {
-                      backgroundColor: location.pathname === item.path ? 'primary.dark' : 'action.hover',
+                      backgroundColor: location.pathname === item.path ? 'primary.dark' : 'rgba(33, 150, 243, 0.08)',
                     },
                   }}
                 >

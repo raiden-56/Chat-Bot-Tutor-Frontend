@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import useNoScroll from '../../hooks/useNoScroll';
 import {
-  Paper,
   TextField,
   Typography,
   Alert,
@@ -10,69 +10,12 @@ import {
   MenuItem,
 } from '@mui/material';
 import { motion } from 'framer-motion';
-import { styled } from '@mui/material/styles';
+
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
 import { authAPI } from '../../services/api';
-import ChatBotTutorImg from '../../assets/ChatBotTutor.png';
+import { FullScreenRoot, LeftSide, RightSide, FormPaper, BackLink, textFieldSx, buttonSx } from '../../components/AuthStyles/AuthStyles';
 
-const FullScreenRoot = styled('div')(({ theme }) => ({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  width: '100vw',
-  height: '100vh',
-  background: 'linear-gradient(90deg, #23a5ff 0%, #12193D 100%)',
-  zIndex: 9999,
-  display: 'flex',
-  flexDirection: 'row',
-  overflow: 'hidden',
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    height: '100vh',
-  },
-}));
-
-const LeftSide = styled('div')(({ theme }) => ({
-  flex: 1,
-  height: '100%',
-  backgroundImage: `url(${ChatBotTutorImg})`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  [theme.breakpoints.down('sm')]: {
-    width: '100vw',
-    height: '40vh',
-    borderRadius: 0,
-  },
-}));
-
-const RightSide = styled('div')(({ theme }) => ({
-  flex: 1,
-  height: '100%',
-  background: 'rgba(18,25,61,0.97)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  [theme.breakpoints.down('sm')]: {
-    width: '100vw',
-    height: '60vh',
-    borderRadius: 0,
-    alignItems: 'flex-start',
-    paddingTop: theme.spacing(5),
-  },
-}));
-
-const FormPaper = styled(Paper)(({ theme }) => ({
-  width: '100%',
-  maxWidth: 500,
-  padding: theme.spacing(5, 4),
-  borderRadius: 32,
-  background: 'rgba(18,25,61, 0.98)',
-  boxShadow: '0 8px 45px rgba(23,165,255,0.22)',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
+// Using AuthStyles components instead of local styled components
 
 interface FormData {
   name: string;
@@ -83,6 +26,7 @@ interface FormData {
 }
 
 const Registration: React.FC = () => {
+  useNoScroll();
   const location = useLocation();
   const navigate = useNavigate();
   const prefilledEmail = location.state?.email || '';
@@ -220,7 +164,7 @@ const Registration: React.FC = () => {
                 margin="normal"
                 required
                 variant="outlined"
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
+                sx={textFieldSx}
               />
               <TextField
                 fullWidth
@@ -232,7 +176,7 @@ const Registration: React.FC = () => {
                 required
                 variant="outlined"
                 disabled={!!prefilledEmail}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
+                sx={textFieldSx}
               />
               <TextField
                 fullWidth
@@ -246,7 +190,7 @@ const Registration: React.FC = () => {
                 SelectProps={{
                   MenuProps: { disablePortal: true }
                 }}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
+                sx={textFieldSx}
               >
                 <MenuItem value="MALE">Male</MenuItem>
                 <MenuItem value="FEMALE">Female</MenuItem>
@@ -260,7 +204,7 @@ const Registration: React.FC = () => {
                 required
                 variant="outlined"
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 15 }}
-                sx={{ '& .MuiOutlinedInput-root': { borderRadius: '15px' } }}
+                sx={textFieldSx}
               />
               {error && (
                 <Alert severity="error" sx={{ mt: 2, borderRadius: '10px' }}>
@@ -274,6 +218,7 @@ const Registration: React.FC = () => {
                   variant="contained"
                   disabled={loading}
                   animationType="bounce"
+                  sx={buttonSx}
                 >
                   {loading ? (
                     <CircularProgress size={24} color="inherit" />

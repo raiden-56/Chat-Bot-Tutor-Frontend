@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { AppBar, Toolbar, Typography, Box, CircularProgress } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, CircularProgress, Avatar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { authAPI } from '../../services/api';
 import { UserInfoResponse } from '../../types/api';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  background: 'rgba(18,25,61,0.97)', // Dark background consistent with Login form
-  boxShadow: '0 4px 20px rgba(23,165,255,0.15)', // Subtle blueish shadow
+  background: '#FFFFFF', // White background
+  boxShadow: '0 2px 10px rgba(0,0,0,0.1)', // Subtle shadow
 }));
 
 const Navbar: React.FC = () => {
@@ -37,22 +37,27 @@ const Navbar: React.FC = () => {
   return (
     <StyledAppBar position="fixed">
       <Toolbar>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: '#23a5ff' }}>
+        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1, color: '#2196F3', fontWeight: 'bold' }}>
           ChatTutor
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           {loading ? (
-            <CircularProgress size={20} color="inherit" />
+            <CircularProgress size={20} color="primary" />
           ) : error ? (
             <Typography variant="body2" color="error">
               {error}
             </Typography>
           ) : userInfo ? (
-            <Typography variant="body1" sx={{ color: '#fff' }}>
-              Welcome, {userInfo.username || userInfo.email}!
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Avatar sx={{ bgcolor: '#2196F3', width: 35, height: 35 }}>
+                {(userInfo.name || userInfo.username || userInfo.email || 'U').charAt(0).toUpperCase()}
+              </Avatar>
+              <Typography variant="body1" sx={{ color: '#212121', fontWeight: 500 }}>
+                {userInfo.name || userInfo.username || userInfo.email}
+              </Typography>
+            </Box>
           ) : (
-            <Typography variant="body1" sx={{ color: '#fff' }}>
+            <Typography variant="body1" sx={{ color: '#212121' }}>
               Guest
             </Typography>
           )}

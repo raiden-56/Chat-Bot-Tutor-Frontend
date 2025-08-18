@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
-  Paper,
   TextField,
   Typography,
   Alert,
@@ -13,88 +12,19 @@ import { styled } from '@mui/material/styles';
 
 import AnimatedButton from '../../components/AnimatedButton/AnimatedButton';
 import { authAPI } from '../../services/api';
-import ChatBotTutorImg from '../../assets/ChatBotTutor.png';
+import { FullScreenRoot, LeftSide, RightSide, FormPaper, textFieldSx, buttonSx } from '../../components/AuthStyles/AuthStyles';
+import useNoScroll from '../../hooks/useNoScroll';
 
-const useNoScroll = () => {
-  useEffect(() => {
-    document.body.style.margin = '0';
-    document.body.style.padding = '0';
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.margin = '';
-      document.body.style.padding = '';
-    };
-  }, []);
-};
-
-const FullScreenRoot = styled('div')(({ theme }) => ({
-  position: 'fixed',
-  top: 0,
-  left: 0,
-  width: '100vw',
-  height: '100vh',
-  background: 'linear-gradient(90deg, #23a5ff 0%, #12193D 100%)',
-  zIndex: 9999,
-  display: 'flex',
-  flexDirection: 'row',
-  overflow: 'hidden',
-  [theme.breakpoints.down('sm')]: {
-    flexDirection: 'column',
-    height: '100vh',
-  },
-}));
-
-const LeftSide = styled('div')(({ theme }) => ({
-  flex: 1,
-  height: '100vh',
-  backgroundImage: `url(${ChatBotTutorImg})`,
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  backgroundRepeat: 'no-repeat',
-  [theme.breakpoints.down('sm')]: {
-    width: '100vw',
-    height: '40vh',
-    borderRadius: 0,
-  },
-}));
-
-const RightSide = styled('div')(({ theme }) => ({
-  flex: 1,
-  height: '100vh',
-  background: 'rgba(18,25,61,0.97)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  [theme.breakpoints.down('sm')]: {
-    width: '100vw',
-    height: '60vh',
-    borderRadius: 0,
-    alignItems: 'flex-start',
-    paddingTop: theme.spacing(5),
-  },
-}));
-
-const FormPaper = styled(Paper)(({ theme }) => ({
-  width: '100%',
-  maxWidth: 420,
-  padding: theme.spacing(5, 4),
-  borderRadius: 32,
-  background: 'rgba(18,25,61, 0.98)',
-  boxShadow: '0 8px 45px rgba(23,165,255,0.22)',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
-
-const BackLink = styled(Link)(({ theme }) => ({
-  color: theme.palette.primary.main,
-  textDecoration: 'none',
-  fontWeight: 'bold',
+// Styled BackLink using react-router-dom's Link
+const BackLink = styled(Link)({
+  textDecoration: 'underline',
+  color: '#1976d2',
+  cursor: 'pointer',
+  fontWeight: 500,
   '&:hover': {
-    textDecoration: 'underline',
+    color: '#115293',
   },
-}));
+});
 
 const SetPassword: React.FC = () => {
   useNoScroll();
@@ -226,16 +156,7 @@ const SetPassword: React.FC = () => {
                     disabled
                     margin="normal"
                     variant="outlined"
-                    sx={{
-                      mb: 2,
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '16px',
-                        background: 'rgba(41,121,255,0.08)',
-                        color: '#fff',
-                      },
-                      input: { color: '#fff' },
-                      label: { color: '#82B1FF' },
-                    }}
+                    sx={textFieldSx}
                   />
                   <TextField
                     fullWidth
@@ -246,16 +167,7 @@ const SetPassword: React.FC = () => {
                     margin="normal"
                     required
                     variant="outlined"
-                    sx={{
-                      mb: 2,
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '16px',
-                        background: 'rgba(41,121,255,0.08)',
-                        color: '#fff',
-                      },
-                      input: { color: '#fff' },
-                      label: { color: '#82B1FF' },
-                    }}
+                    sx={textFieldSx}
                   />
                   <TextField
                     fullWidth
@@ -266,16 +178,7 @@ const SetPassword: React.FC = () => {
                     margin="normal"
                     required
                     variant="outlined"
-                    sx={{
-                      mb: 2,
-                      '& .MuiOutlinedInput-root': {
-                        borderRadius: '16px',
-                        background: 'rgba(41,121,255,0.08)',
-                        color: '#fff',
-                      },
-                      input: { color: '#fff' },
-                      label: { color: '#82B1FF' },
-                    }}
+                    sx={textFieldSx}
                   />
                   {error && (
                     <Alert severity="error" sx={{ mt: 1, borderRadius: '8px' }}>
@@ -289,14 +192,7 @@ const SetPassword: React.FC = () => {
                       variant="contained"
                       disabled={loading || !formData.password || !formData.confirmPassword}
                       animationType="bounce"
-                      sx={{
-                        py: 1.5,
-                        borderRadius: '38px',
-                        fontWeight: 600,
-                        fontSize: '1.1rem',
-                        background: 'linear-gradient(90deg, #23a5ff 0%, #23ffd9 100%)',
-                        color: '#fff',
-                      }}
+                      sx={buttonSx}
                     >
                       {loading ? (
                         <CircularProgress size={24} color="inherit" />
