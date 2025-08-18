@@ -165,7 +165,7 @@ const Dashboard = () => {
       value: `${totalStudyHours}h`,
       icon: <Timer />,
       color: '#90caf9',
-      change: 'This month'
+      change: ''
     },
     {
       title: 'Achievements',
@@ -257,7 +257,7 @@ const Dashboard = () => {
           display="flex"
           justifyContent="space-between"
           alignItems="center"
-          mb={5}
+          mb={2}
         >
           <Box>
             <Typography variant="h4" fontWeight={600} gutterBottom>
@@ -267,18 +267,18 @@ const Dashboard = () => {
               Here's what's happening with your kids' learning journey
             </Typography>
           </Box>
-          <VirtualCharacter
+          {/* <VirtualCharacter
             size="lg"
             animation="celebrating"
             message="Your kids are doing amazing!"
-          />
+          /> */}
         </Box>
       </motion.div>
 
       {/* Stats Cards */}
       <Grid container spacing={4} mb={4}>
         {statsCards.map((stat, index) => (
-          <Grid item xs={12} sm={6} md={3} key={stat.title}>
+          <Grid size={{xs:12, sm:6, md:3}} key={stat.title}>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -329,7 +329,7 @@ const Dashboard = () => {
       {/* Charts Section */}
       <Grid container spacing={4} mb={4}>
         {/* Subject Distribution */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{xs:12, md:4}}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -377,7 +377,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Learning Progress */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{xs:12, md:8}}>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -412,7 +412,7 @@ const Dashboard = () => {
       {/* Weekly Study Hours & Recent Activities */}
       <Grid container spacing={4}>
         {/* Weekly Study Hours */}
-        <Grid item xs={12} md={6}>
+        <Grid size={{xs:12, md:6}}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -436,7 +436,7 @@ const Dashboard = () => {
         </Grid>
 
         {/* Recent Activities */}
-        <Grid item xs={12} md={6}>
+        <Grid  size={{xs:12, md:6}}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

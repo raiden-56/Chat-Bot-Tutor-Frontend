@@ -50,17 +50,17 @@ const Kids = () => {
   const [chatHistory, setChatHistory] = useState<{question: string, answer: string}[]>([]);
   const [askingQuestion, setAskingQuestion] = useState(false);
 
+  const fetchKids = async () => {
+    try {
+      const response = await kidsAPI.getAllKids();
+      setKids(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching kids:", error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchKids = async () => {
-      try {
-        const response = await kidsAPI.getAllKids();
-        setKids(response.data.data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching kids:", error);
-        setLoading(false);
-      }
-    };
 
     fetchKids();
   }, []);
@@ -95,6 +95,7 @@ const Kids = () => {
       } else {
         const response = await kidsAPI.createKid(newKid);
         const createdKid = response.data.data;
+        fetchKids()
         setKids([...kids, createdKid]);
       }
       setOpenDialog(false);
@@ -238,17 +239,17 @@ const Kids = () => {
                 fontWeight: 'bold'
               }}
             >
-              {kid.name.charAt(0).toUpperCase()}
+              {kid?.name?.charAt(0).toUpperCase()}
             </Avatar>
             <Box>
               <Typography variant="h6" className="font-bold">
-                {kid.name}
+                {kid?.name}
               </Typography>
               <Typography variant="body2" className="text-muted-foreground">
-                Age {kid.age} • {kid.standard}
+                Age {kid?.age} • {kid?.standard}
               </Typography>
               <Typography variant="caption" className="text-muted-foreground">
-                {kid.school}
+                {kid?.school}
               </Typography>
             </Box>
           </Box>
@@ -377,25 +378,10 @@ const Kids = () => {
             <Typography variant="h3" className="font-bold text-foreground mb-2">
               Your Kids 👨‍👩‍👧‍👦
             </Typography>
-            <Typography variant="h6" className="text-muted-foreground">
+            <Typography fontWeight={400} className="text-muted-foreground">
               Manage and track your children's learning progress
             </Typography>
           </Box>
-          <VirtualCharacter 
-            size="lg" 
-            animation="talking" 
-            message="Let's check on the kids!"
-          />
-        </Box>
-      </motion.div>
-
-      {/* Add Kid Button */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, duration: 0.3 }}
-      >
-        <Box className="mb-6">
           <Button
             variant="contained"
             size="large"
@@ -411,6 +397,17 @@ const Kids = () => {
           >
             Add New Kid
           </Button>
+        </Box>
+      </motion.div>
+
+      {/* Add Kid Button */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, duration: 0.3 }}
+      >
+        <Box className="mb-6">
+          
         </Box>
       </motion.div>
 

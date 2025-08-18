@@ -55,7 +55,8 @@ const Sidebar: React.FC = () => {
     <StyledDrawer
       variant="permanent"
       sx={{
-        '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box' },
+        borderRadius:"0px",
+        '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box', borderRadius:"0px" },
       }}
     >
       <Toolbar />
