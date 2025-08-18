@@ -60,7 +60,6 @@ const Profile = () => {
 
   const handleSave = async () => {
     if (!profile || !editedProfile) return;
-
     try {
       await usersAPI.updateUserById(profile.id, editedProfile);
       setProfile({ ...profile, ...editedProfile });
@@ -86,11 +85,11 @@ const Profile = () => {
   };
 
   const handleNotificationChange = (field: string, value: boolean) => {
-    // This functionality is not available in the API
+    // API not available
   };
 
   const handlePreferenceChange = (field: string, value: any) => {
-    // This functionality is not available in the API
+    // API not available
   };
 
   const stats = [
@@ -117,9 +116,9 @@ const Profile = () => {
               Manage your account information and preferences
             </Typography>
           </Box>
-          <VirtualCharacter 
-            size="lg" 
-            animation="thinking" 
+          <VirtualCharacter
+            size="lg"
+            animation="thinking"
             message="Let's update your profile!"
           />
         </Box>
@@ -140,7 +139,7 @@ const Profile = () => {
 
       <Grid container spacing={3}>
         {/* Profile Information */}
-        <Grid size={{ xs: 12, lg: 8 }}>
+        <Grid item xs={12} lg={8}>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -181,7 +180,7 @@ const Profile = () => {
                   )}
                 </Box>
 
-                {/* Profile Picture and Basic Info */}
+                {/* Profile Picture and Info */}
                 <Box className="flex items-center gap-4 mb-6">
                   {profile && (
                     <Avatar
@@ -218,7 +217,7 @@ const Profile = () => {
                 {/* Form Fields */}
                 {profile && editedProfile && (
                   <Grid container spacing={3}>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
                         label="Full Name"
@@ -228,7 +227,7 @@ const Profile = () => {
                         variant="outlined"
                       />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <Grid item xs={12} sm={6}>
                       <TextField
                         fullWidth
                         label="Email Address"
@@ -238,28 +237,28 @@ const Profile = () => {
                         variant="outlined"
                       />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                    <TextField
-                      fullWidth
-                      label="Phone Number"
-                      value={isEditing ? editedProfile.phone_number : profile.phone_number}
-                      onChange={(e) => handleInputChange('phone_number', e.target.value)}
-                      disabled={!isEditing}
-                      variant="outlined"
-                    />
-                  </Grid>
-                  <Grid size={{ xs: 12 }}>
-                    <TextField
-                      fullWidth
-                      label="Address"
-                      value={isEditing ? editedProfile.address : profile.address}
-                      onChange={(e) => handleInputChange('address', e.target.value)}
-                      disabled={!isEditing}
-                      variant="outlined"
-                      multiline
-                      rows={2}
-                    />
-                  </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        label="Phone Number"
+                        value={isEditing ? editedProfile.phone_number : profile.phone_number}
+                        onChange={(e) => handleInputChange('phone_number', e.target.value)}
+                        disabled={!isEditing}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Address"
+                        value={isEditing ? editedProfile.address : profile.address}
+                        onChange={(e) => handleInputChange('address', e.target.value)}
+                        disabled={!isEditing}
+                        variant="outlined"
+                        multiline
+                        rows={2}
+                      />
+                    </Grid>
                   </Grid>
                 )}
               </CardContent>
@@ -283,49 +282,45 @@ const Profile = () => {
                 </Box>
 
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid item xs={12} sm={6}>
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={isEditing ? editedProfile.notifications.email : profile.notifications.email}
-                          onChange={(e) => handleNotificationChange('email', e.target.checked)}
-                          disabled={!isEditing}
+                          checked={false}
+                          disabled={true}
                         />
                       }
                       label="Email Notifications"
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid item xs={12} sm={6}>
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={isEditing ? editedProfile.notifications.push : profile.notifications.push}
-                          onChange={(e) => handleNotificationChange('push', e.target.checked)}
-                          disabled={!isEditing}
+                          checked={false}
+                          disabled={true}
                         />
                       }
                       label="Push Notifications"
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid item xs={12} sm={6}>
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={isEditing ? editedProfile.notifications.kidProgress : profile.notifications.kidProgress}
-                          onChange={(e) => handleNotificationChange('kidProgress', e.target.checked)}
-                          disabled={!isEditing}
+                          checked={false}
+                          disabled={true}
                         />
                       }
                       label="Kid Progress Updates"
                     />
                   </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
+                  <Grid item xs={12} sm={6}>
                     <FormControlLabel
                       control={
                         <Switch
-                          checked={isEditing ? editedProfile.notifications.quizReminders : profile.notifications.quizReminders}
-                          onChange={(e) => handleNotificationChange('quizReminders', e.target.checked)}
-                          disabled={!isEditing}
+                          checked={false}
+                          disabled={true}
                         />
                       }
                       label="Quiz Reminders"
@@ -338,7 +333,7 @@ const Profile = () => {
         </Grid>
 
         {/* Statistics and Quick Actions */}
-        <Grid size={{ xs: 12, lg: 4 }}>
+        <Grid item xs={12} lg={4}>
           {/* Statistics */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -352,7 +347,7 @@ const Profile = () => {
                 </Typography>
                 <Grid container spacing={2}>
                   {stats.map((stat, index) => (
-                    <Grid size={6} key={stat.label}>
+                    <Grid item xs={6} key={stat.label}>
                       <motion.div
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}

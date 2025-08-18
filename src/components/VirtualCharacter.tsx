@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import tutorCharacterImage from '../assets/tutor-character.png';
+import { Box } from '@mui/material';
 
 interface VirtualCharacterProps {
   size?: 'sm' | 'md' | 'lg';
@@ -9,11 +10,11 @@ interface VirtualCharacterProps {
   className?: string;
 }
 
-const VirtualCharacter = ({ 
-  size = 'md', 
-  animation = 'idle', 
-  message, 
-  className = '' 
+const VirtualCharacter = ({
+  size = 'md',
+  animation = 'idle',
+  message,
+  className = ''
 }: VirtualCharacterProps) => {
   const [currentAnimation, setCurrentAnimation] = useState(animation);
 
@@ -22,9 +23,9 @@ const VirtualCharacter = ({
   }, [animation]);
 
   const sizeClasses = {
-    sm: 'w-16 h-16',
-    md: 'w-24 h-24',
-    lg: 'w-32 h-32'
+    sm: { width: 64, height: 64 },
+    md: { width: 96, height: 96 },
+    lg: { width: 128, height: 128 }
   };
 
   const getAnimationVariants = () => {
@@ -33,8 +34,8 @@ const VirtualCharacter = ({
         return {
           scale: [1, 1.05, 1],
           rotate: [-2, 2, -2, 0],
-          transition: { 
-            duration: 0.8, 
+          transition: {
+            duration: 0.8,
             repeat: Infinity,
             repeatType: "loop" as const
           }
@@ -44,8 +45,8 @@ const VirtualCharacter = ({
           scale: [1, 1.2, 1],
           rotate: [0, 10, -10, 0],
           y: [0, -10, 0],
-          transition: { 
-            duration: 1.2, 
+          transition: {
+            duration: 1.2,
             repeat: Infinity,
             repeatType: "loop" as const
           }
@@ -54,8 +55,8 @@ const VirtualCharacter = ({
         return {
           scale: [1, 1.02, 1],
           rotate: [0, 3, -3, 0],
-          transition: { 
-            duration: 2, 
+          transition: {
+            duration: 2,
             repeat: Infinity,
             repeatType: "loop" as const
           }
@@ -63,8 +64,8 @@ const VirtualCharacter = ({
       default: // idle
         return {
           y: [0, -5, 0],
-          transition: { 
-            duration: 3, 
+          transition: {
+            duration: 3,
             repeat: Infinity,
             repeatType: "loop" as const
           }
@@ -73,20 +74,31 @@ const VirtualCharacter = ({
   };
 
   return (
-    <div className={`character-container flex flex-col items-center ${className}`}>
+    <Box display="flex" flexDirection="column" alignItems="center" className={className}>
       <motion.div
-        className={`${sizeClasses[size]} relative`}
+        style={{ ...sizeClasses[size], position: 'relative' }}
         animate={getAnimationVariants()}
       >
         <img
           src={tutorCharacterImage}
           alt="AI Tutor Character"
-          className="w-full h-full object-contain drop-shadow-lg"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
+          }}
         />
-        
         {/* Glow effect */}
         <motion.div
-          className="absolute inset-0 bg-primary/20 rounded-full blur-xl -z-10"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'rgba(33,150,243,0.2)',
+            borderRadius: '50%',
+            filter: 'blur(16px)',
+            zIndex: -1
+          }}
           animate={{
             scale: [1, 1.1, 1],
             opacity: [0.3, 0.6, 0.3],
@@ -104,16 +116,40 @@ const VirtualCharacter = ({
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="mt-4 bg-white border-2 border-primary rounded-xl px-4 py-2 shadow-lg relative max-w-xs"
+          style={{
+            marginTop: 16,
+            background: '#fff',
+            border: '2px solid #2196f3',
+            borderRadius: 16,
+            padding: '8px 20px',
+            boxShadow: '0 4px 16px rgba(33,150,243,0.15)',
+            position: 'relative',
+            maxWidth: 250
+          }}
         >
-          <div className="text-sm text-foreground font-medium text-center">
+          <div style={{
+            fontSize: 14,
+            color: '#1976d2',
+            fontWeight: 500,
+            textAlign: 'center'
+          }}>
             {message}
           </div>
           {/* Speech bubble arrow */}
-          <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-white border-t-2 border-l-2 border-primary rotate-45" />
+          <div style={{
+            position: 'absolute',
+            top: -10,
+            left: '50%',
+            transform: 'translateX(-50%) rotate(45deg)',
+            width: 16,
+            height: 16,
+            background: '#fff',
+            borderTop: '2px solid #2196f3',
+            borderLeft: '2px solid #2196f3'
+          }} />
         </motion.div>
       )}
-    </div>
+    </Box>
   );
 };
 

@@ -15,7 +15,10 @@ import {
   DialogContent,
   TextField,
   DialogActions,
-  LinearProgress
+  LinearProgress,
+  Paper,
+  CircularProgress,
+  Divider
 } from '@mui/material';
 import {
   Add,
@@ -23,7 +26,8 @@ import {
   Delete,
   Chat,
   Quiz,
-  TrendingUp
+  TrendingUp,
+  Send
 } from '@mui/icons-material';
 import VirtualCharacter from '../../components/VirtualCharacter';
 import { kidsAPI } from '../../services/api';
@@ -33,6 +37,7 @@ const Kids = () => {
   const [kids, setKids] = useState<GetKidResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openChatDialog, setOpenChatDialog] = useState(false);
   const [selectedKid, setSelectedKid] = useState<GetKidResponse | null>(null);
   const [newKid, setNewKid] = useState<KidRequest>({
     name: '',
@@ -41,6 +46,9 @@ const Kids = () => {
     school: '',
     standard: ''
   });
+  const [question, setQuestion] = useState('');
+  const [chatHistory, setChatHistory] = useState<{question: string, answer: string}[]>([]);
+  const [askingQuestion, setAskingQuestion] = useState(false);
 
   useEffect(() => {
     const fetchKids = async () => {
@@ -101,6 +109,89 @@ const Kids = () => {
       setKids(kids.filter(kid => kid.id !== kidId));
     } catch (error) {
       console.error("Error deleting kid:", error);
+    }
+  };
+
+  const handleOpenChatDialog = async (kid: GetKidResponse) => {
+    setSelectedKid(kid);
+    setQuestion('');
+    setOpenChatDialog(true);
+    setAskingQuestion(true);
+    
+    try {
+      // Fetch question history when opening chat dialog
+      const historyResponse = await kidsAPI.getQuestionsHistory(kid.id);
+      
+      if (historyResponse.data && historyResponse.data.data && historyResponse.data.data.length > 0) {
+        // Convert the history response to our chat history format
+        const formattedHistory = historyResponse.data.data.map(item => ({
+          question: item.question,
+          answer: item.answer || 'I processed your question. Let me think about that!'
+        }));
+        
+        setChatHistory(formattedHistory);
+      } else {
+        // If no history, show empty chat
+        setChatHistory([]);
+      }
+    } catch (error) {
+      console.error("Error fetching question history:", error);
+      setChatHistory([]);
+    } finally {
+      setAskingQuestion(false);
+    }
+  };
+
+  const handleCloseChat = () => {
+    setOpenChatDialog(false);
+  };
+
+  const handleAskQuestion = async () => {
+    if (!question.trim() || !selectedKid) return;
+    
+    // Add user question to chat history
+    const newQuestion = { question, answer: '' };
+    setChatHistory(prevHistory => [...prevHistory, newQuestion]);
+    setAskingQuestion(true);
+    
+    try {
+      // Send question to API
+      await kidsAPI.createQuestion(selectedKid.id, { question });
+      
+      // Get questions history after creating the question
+      const historyResponse = await kidsAPI.getQuestionsHistory(selectedKid.id);
+      
+      // Update chat history with the latest questions and answers
+      if (historyResponse.data && historyResponse.data.data && historyResponse.data.data.length > 0) {
+        // Convert the history response to our chat history format
+        const formattedHistory = historyResponse.data.data.map(item => ({
+          question: item.question,
+          answer: item.answer || 'I processed your question. Let me think about that!'
+        }));
+        
+        setChatHistory(formattedHistory);
+      } else {
+        // If no history is returned, update just the current question
+        setChatHistory(prevHistory => {
+          const updatedHistory = [...prevHistory];
+          const lastQuestion = updatedHistory[updatedHistory.length - 1];
+          lastQuestion.answer = 'I processed your question. Let me think about that!';
+          return updatedHistory;
+        });
+      }
+      
+      setQuestion('');
+    } catch (error) {
+      console.error("Error asking question:", error);
+      // Add error message to chat history
+      setChatHistory(prevHistory => {
+        const updatedHistory = [...prevHistory];
+        const lastQuestion = updatedHistory[updatedHistory.length - 1];
+        lastQuestion.answer = 'Sorry, I had trouble processing your question. Please try again.';
+        return updatedHistory;
+      });
+    } finally {
+      setAskingQuestion(false);
     }
   };
 
@@ -240,6 +331,7 @@ const Kids = () => {
                 startIcon={<Chat />}
                 fullWidth
                 sx={{ fontSize: '0.75rem' }}
+                onClick={() => handleOpenChatDialog(kid)}
               >
                 Chat
               </Button>
@@ -402,6 +494,124 @@ const Kids = () => {
             {selectedKid ? 'Update' : 'Add Kid'}
           </Button>
         </DialogActions>
+      </Dialog>
+
+      {/* Chat Dialog */}
+      <Dialog
+        open={openChatDialog}
+        onClose={handleCloseChat}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: 2,
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white', display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Chat fontSize="small" />
+          Chat with Tutor {selectedKid && `- ${selectedKid.name}`}
+        </DialogTitle>
+        
+        <DialogContent sx={{ p: 2, height: '400px', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2, p: 1 }}>
+            {chatHistory.length === 0 ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', opacity: 0.7 }}>
+                <Typography variant="body1" sx={{ mb: 1, fontWeight: 'medium' }}>
+                  Ask me anything about your studies!
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  I'm here to help with your questions.
+                </Typography>
+              </Box>
+            ) : (
+              chatHistory.map((chat, index) => (
+                <Box key={index} sx={{ mb: 2 }}>
+                  {/* Question */}
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 1.5,
+                        bgcolor: 'primary.light',
+                        color: 'primary.contrastText',
+                        borderRadius: '12px 12px 0 12px',
+                        maxWidth: '80%'
+                      }}
+                    >
+                      <Typography variant="body2">{chat.question}</Typography>
+                    </Paper>
+                  </Box>
+                  
+                  {/* Answer */}
+                  {chat.answer ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 1.5,
+                          bgcolor: 'grey.100',
+                          borderRadius: '12px 12px 12px 0',
+                          maxWidth: '80%'
+                        }}
+                      >
+                        <Typography variant="body2">{chat.answer}</Typography>
+                      </Paper>
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 1.5,
+                          bgcolor: 'grey.100',
+                          borderRadius: '12px 12px 12px 0',
+                          maxWidth: '80%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1
+                        }}
+                      >
+                        <CircularProgress size={16} />
+                        <Typography variant="body2">Thinking...</Typography>
+                      </Paper>
+                    </Box>
+                  )}
+                </Box>
+              ))
+            )}
+            {askingQuestion && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            )}
+          </Box>
+          
+          <Divider sx={{ mb: 2 }} />
+          
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <TextField
+              fullWidth
+              placeholder="Ask a question..."
+              variant="outlined"
+              size="small"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAskQuestion()}
+              disabled={askingQuestion}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAskQuestion}
+              disabled={!question.trim() || askingQuestion}
+              startIcon={<Send />}
+            >
+              Ask
+            </Button>
+          </Box>
+        </DialogContent>
       </Dialog>
     </Container>
   );

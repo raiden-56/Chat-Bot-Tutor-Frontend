@@ -66,7 +66,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           <Box className="flex items-center space-x-3">
             <VirtualCharacter size="sm" animation="idle" />
             <Typography variant="h6" sx={{ color: 'white', fontWeight: 'bold' }}>
-              BrightSpark
+              Chatbot Tutor
             </Typography>
           </Box>
           {!isMobile && (
