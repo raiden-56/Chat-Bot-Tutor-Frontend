@@ -1,210 +1,437 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, CircularProgress, Alert, TextField, Button } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+  Button,
+  TextField,
+  Avatar,
+  Divider,
+  Switch,
+  FormControlLabel,
+  Alert,
+  Chip
+} from '@mui/material';
+import {
+  Edit,
+  Save,
+  Cancel,
+  Security,
+  Notifications,
+  Language,
+  Palette,
+  ChildCare
+} from '@mui/icons-material';
+import VirtualCharacter from '../../components/VirtualCharacter';
 import { authAPI, usersAPI } from '../../services/api';
-import { UserInfoResponse, UpdateUserRequest } from '../../types/api';
+import { GetUserDetailsResponse, UpdateUserRequest } from '../../types/api';
 
-const StyledPaper = styled(Paper)(({ theme }) => ({
-  background: 'rgba(18,25,61,0.97)',
-  color: '#fff',
-  borderRadius: '16px',
-  boxShadow: '0 8px 45px rgba(23,165,255,0.22)',
-  padding: theme.spacing(4),
-  maxWidth: 600,
-  margin: 'auto',
-}));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  marginBottom: theme.spacing(2),
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '16px',
-    background: 'rgba(41,121,255,0.08)',
-    color: '#fff',
-  },
-  input: { color: '#fff' },
-  label: { color: '#82B1FF' },
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  marginTop: theme.spacing(2),
-  background: 'linear-gradient(90deg, #23a5ff 0%, #23ffd9 100%)',
-  color: '#fff',
-  borderRadius: '38px',
-  fontWeight: 600,
-  padding: theme.spacing(1.5, 3),
-  '&:hover': {
-    opacity: 0.9,
-  },
-}));
-
-const ProfilePage: React.FC = () => {
-  const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<UpdateUserRequest>({
-    username: '',
-    email: '', // Assuming email can be updated, though often it's not
-  });
-  const [updateError, setUpdateError] = useState<string | null>(null);
-  const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
-  const [updating, setUpdating] = useState(false);
-
-  const fetchUserInfo = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await authAPI.getUserInfo();
-      if (response.data.success) {
-        setUserInfo(response.data.data);
-        setFormData({
-          username: response.data.data.username || '',
-          email: response.data.data.email || '',
-        });
-      } else {
-        setError(response.data.message || 'Failed to fetch user info.');
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Error fetching user info.');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [profile, setProfile] = useState<GetUserDetailsResponse | null>(null);
+  const [editedProfile, setEditedProfile] = useState<UpdateUserRequest | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchUserInfo();
+    const fetchProfile = async () => {
+      try {
+        const response = await authAPI.getUserInfo();
+        const userDetailsResponse = await usersAPI.getUserById(response.data.data.id);
+        setProfile(userDetailsResponse.data.data);
+        setEditedProfile(userDetailsResponse.data.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleEdit = () => {
+    setIsEditing(true);
   };
 
   const handleSave = async () => {
-    setUpdating(true);
-    setUpdateError(null);
-    setUpdateSuccess(null);
+    if (!profile || !editedProfile) return;
+
     try {
-      // Assuming the API has a way to identify the current user for update,
-      // or that the user ID is part of the UserInfoResponse and can be used.
-      // For now, I'll assume `usersAPI.updateUserById` needs a userId.
-      // If the backend handles current user update without ID, this part needs adjustment.
-      // For simplicity, I'll assume `userInfo.id` is available and required.
-      if (!userInfo?.id) {
-        setUpdateError('User ID not found for update.');
-        setUpdating(false);
-        return;
-      }
-      const response = await usersAPI.updateUserById(userInfo.id, formData);
-      if (response.data.success) {
-        setUpdateSuccess('Profile updated successfully!');
-        setIsEditing(false);
-        fetchUserInfo(); // Refresh info after update
-      } else {
-        setUpdateError(response.data.message || 'Failed to update profile.');
-      }
-    } catch (err: any) {
-      setUpdateError(err.response?.data?.message || 'Error updating profile.');
-    } finally {
-      setUpdating(false);
+      await usersAPI.updateUserById(profile.id, editedProfile);
+      setProfile({ ...profile, ...editedProfile });
+      setIsEditing(false);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (error) {
+      console.error("Error saving profile:", error);
     }
   };
 
+  const handleCancel = () => {
+    setEditedProfile(profile);
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    if (!editedProfile) return;
+    setEditedProfile({
+      ...editedProfile,
+      [field]: value
+    });
+  };
+
+  const handleNotificationChange = (field: string, value: boolean) => {
+    // This functionality is not available in the API
+  };
+
+  const handlePreferenceChange = (field: string, value: any) => {
+    // This functionality is not available in the API
+  };
+
+  const stats = [
+    { label: 'Total Kids', value: '0', color: '#1976d2' }, // Placeholder
+    { label: 'Active Sessions', value: '0', color: '#42a5f5' }, // Placeholder
+    { label: 'Completed Quizzes', value: '0', color: '#90caf9' }, // Placeholder
+    { label: 'Achievements Earned', value: '0', color: '#ffd54f' } // Placeholder
+  ];
+
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ color: '#fff', mb: 4, textAlign: 'center' }}>
-        Your Profile
-      </Typography>
-
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}>
-          <CircularProgress />
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Box className="flex items-center justify-between mb-8">
+          <Box>
+            <Typography variant="h3" className="font-bold text-foreground mb-2">
+              Profile Settings ⚙️
+            </Typography>
+            <Typography variant="h6" className="text-muted-foreground">
+              Manage your account information and preferences
+            </Typography>
+          </Box>
+          <VirtualCharacter 
+            size="lg" 
+            animation="thinking" 
+            message="Let's update your profile!"
+          />
         </Box>
-      ) : error ? (
-        <Alert severity="error">{error}</Alert>
-      ) : userInfo ? (
-        <StyledPaper elevation={6}>
-          {updateError && <Alert severity="error" sx={{ mb: 2 }}>{updateError}</Alert>}
-          {updateSuccess && <Alert severity="success" sx={{ mb: 2 }}>{updateSuccess}</Alert>}
+      </motion.div>
 
-          {!isEditing ? (
-            <Box>
-              <Typography variant="h6" sx={{ color: '#23a5ff', mb: 1 }}>
-                Username: <span style={{ color: '#fff' }}>{userInfo.username || 'N/A'}</span>
-              </Typography>
-              <Typography variant="h6" sx={{ color: '#23a5ff', mb: 2 }}>
-                Email: <span style={{ color: '#fff' }}>{userInfo.email || 'N/A'}</span>
-              </Typography>
-              <StyledButton onClick={() => setIsEditing(true)}>
-                Edit Profile
-              </StyledButton>
-            </Box>
-          ) : (
-            <Box component="form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-              <StyledTextField
-                fullWidth
-                label="Username"
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                sx={{ mb: 2 }}
-              />
-              <StyledTextField
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                sx={{ mb: 2 }}
-              />
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                <StyledButton
-                  variant="outlined"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setUpdateError(null);
-                    setUpdateSuccess(null);
-                    // Reset form data to original if cancelled
-                    setFormData({
-                      username: userInfo.username || '',
-                      email: userInfo.email || '',
-                    });
-                  }}
-                  sx={
-                    {
-                      borderColor: '#82B1FF',
-                      color: '#82B1FF',
-                      '&:hover': {
-                        backgroundColor: 'rgba(41,121,255,0.1)',
-                        borderColor: '#82B1FF',
-                      },
-                    }
-                  }
-                >
-                  Cancel
-                </StyledButton>
-                <StyledButton
-                  type="submit"
-                  variant="contained"
-                  disabled={updating}
-                >
-                  {updating ? <CircularProgress size={24} color="inherit" /> : 'Save Changes'}
-                </StyledButton>
-              </Box>
-            </Box>
-          )}
-        </StyledPaper>
-      ) : (
-        <Typography variant="h6" align="center" sx={{ mt: 5, color: '#ccc' }}>
-          User information not available.
-        </Typography>
+      {/* Success Alert */}
+      {showSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4"
+        >
+          <Alert severity="success">
+            Profile updated successfully!
+          </Alert>
+        </motion.div>
       )}
-    </Box>
+
+      <Grid container spacing={3}>
+        {/* Profile Information */}
+        <Grid size={{ xs: 12, lg: 8 }}>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            <Card className="card-elevated">
+              <CardContent>
+                <Box className="flex items-center justify-between mb-6">
+                  <Typography variant="h5" className="font-bold">
+                    Personal Information
+                  </Typography>
+                  {!isEditing ? (
+                    <Button
+                      variant="outlined"
+                      startIcon={<Edit />}
+                      onClick={handleEdit}
+                    >
+                      Edit Profile
+                    </Button>
+                  ) : (
+                    <Box className="flex gap-2">
+                      <Button
+                        variant="outlined"
+                        startIcon={<Cancel />}
+                        onClick={handleCancel}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<Save />}
+                        onClick={handleSave}
+                        className="btn-hero"
+                      >
+                        Save Changes
+                      </Button>
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Profile Picture and Basic Info */}
+                <Box className="flex items-center gap-4 mb-6">
+                  {profile && (
+                    <Avatar
+                      sx={{
+                        width: 80,
+                        height: 80,
+                        bgcolor: 'primary.main',
+                        fontSize: '2rem',
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {profile.name.split(' ').map(n => n[0]).join('')}
+                    </Avatar>
+                  )}
+                  <Box>
+                    <Typography variant="h6" className="font-bold">
+                      {profile?.name}
+                    </Typography>
+                    <Typography variant="body2" className="text-muted-foreground">
+                      Parent Account
+                    </Typography>
+                    <Chip
+                      label="Premium Member"
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                      sx={{ mt: 1 }}
+                    />
+                  </Box>
+                </Box>
+
+                <Divider sx={{ mb: 4 }} />
+
+                {/* Form Fields */}
+                {profile && editedProfile && (
+                  <Grid container spacing={3}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Full Name"
+                        value={isEditing ? editedProfile.name : profile.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        disabled={!isEditing}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        fullWidth
+                        label="Email Address"
+                        value={isEditing ? editedProfile.email : profile.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        disabled={!isEditing}
+                        variant="outlined"
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                    <TextField
+                      fullWidth
+                      label="Phone Number"
+                      value={isEditing ? editedProfile.phone_number : profile.phone_number}
+                      onChange={(e) => handleInputChange('phone_number', e.target.value)}
+                      disabled={!isEditing}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12 }}>
+                    <TextField
+                      fullWidth
+                      label="Address"
+                      value={isEditing ? editedProfile.address : profile.address}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
+                      disabled={!isEditing}
+                      variant="outlined"
+                      multiline
+                      rows={2}
+                    />
+                  </Grid>
+                  </Grid>
+                )}
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Notification Settings */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="mt-4"
+          >
+            <Card className="card-elevated">
+              <CardContent>
+                <Box className="flex items-center gap-2 mb-4">
+                  <Notifications color="primary" />
+                  <Typography variant="h5" className="font-bold">
+                    Notification Preferences
+                  </Typography>
+                </Box>
+
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={isEditing ? editedProfile.notifications.email : profile.notifications.email}
+                          onChange={(e) => handleNotificationChange('email', e.target.checked)}
+                          disabled={!isEditing}
+                        />
+                      }
+                      label="Email Notifications"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={isEditing ? editedProfile.notifications.push : profile.notifications.push}
+                          onChange={(e) => handleNotificationChange('push', e.target.checked)}
+                          disabled={!isEditing}
+                        />
+                      }
+                      label="Push Notifications"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={isEditing ? editedProfile.notifications.kidProgress : profile.notifications.kidProgress}
+                          onChange={(e) => handleNotificationChange('kidProgress', e.target.checked)}
+                          disabled={!isEditing}
+                        />
+                      }
+                      label="Kid Progress Updates"
+                    />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={isEditing ? editedProfile.notifications.quizReminders : profile.notifications.quizReminders}
+                          onChange={(e) => handleNotificationChange('quizReminders', e.target.checked)}
+                          disabled={!isEditing}
+                        />
+                      }
+                      label="Quiz Reminders"
+                    />
+                  </Grid>
+                </Grid>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </Grid>
+
+        {/* Statistics and Quick Actions */}
+        <Grid size={{ xs: 12, lg: 4 }}>
+          {/* Statistics */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            <Card className="card-elevated mb-4">
+              <CardContent>
+                <Typography variant="h6" className="font-bold mb-4">
+                  Account Statistics
+                </Typography>
+                <Grid container spacing={2}>
+                  {stats.map((stat, index) => (
+                    <Grid size={6} key={stat.label}>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.5 + index * 0.1, duration: 0.3 }}
+                      >
+                        <Box className="text-center p-3 rounded-lg bg-accent/50">
+                          <Typography
+                            variant="h5"
+                            className="font-bold mb-1"
+                            sx={{ color: stat.color }}
+                          >
+                            {stat.value}
+                          </Typography>
+                          <Typography variant="caption" className="text-muted-foreground">
+                            {stat.label}
+                          </Typography>
+                        </Box>
+                      </motion.div>
+                    </Grid>
+                  ))}
+                </Grid>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          {/* Quick Actions */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <Card className="card-elevated">
+              <CardContent>
+                <Typography variant="h6" className="font-bold mb-4">
+                  Quick Actions
+                </Typography>
+                <Box className="space-y-3">
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<Security />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    Change Password
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<ChildCare />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    Hand Over to Child
+                  </Button>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<Language />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    Download Data
+                  </Button>
+                  <Divider sx={{ my: 2 }} />
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="error"
+                    startIcon={<Security />}
+                    sx={{ justifyContent: 'flex-start' }}
+                  >
+                    Delete Account
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 
-export default ProfilePage;
+export default Profile;
