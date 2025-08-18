@@ -1,5 +1,4 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -17,7 +16,8 @@ import {
   Avatar,
   Divider,
   useMediaQuery,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -27,18 +27,41 @@ import {
   Logout,
   ChevronLeft
 } from '@mui/icons-material';
-import VirtualCharacter from '../VirtualCharacter';
+import { authAPI } from '../../services/api';
 
 const drawerWidth = 280;
 
-// Define React functional component with children prop
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [desktopOpen, setDesktopOpen] = useState(true);
+  const [userInfo, setUserInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const navigate = useNavigate();
   const location = useLocation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        // FIX: Check status_message
+        const response = await authAPI.getUserInfo();
+        if (response.data.status_message === "SUCCESS") {
+          setUserInfo(response.data.data);
+        } else {
+          setError(response.data || 'Failed to fetch user info');
+        }
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Error fetching user info');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
 
   const handleDrawerToggle = () => {
     if (isMobile) {
@@ -75,7 +98,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           )}
         </Box>
       </Box>
-
       {/* Navigation */}
       <Box sx={{ flex: 1, p: 1 }}>
         <List>
@@ -116,7 +138,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           ))}
         </List>
       </Box>
-
       {/* Footer */}
       <Box sx={{ p: 2 }}>
         <Divider sx={{ mb: 2 }} />
@@ -146,6 +167,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </Box>
     </Box>
   );
+
+  const displayName = userInfo?.name || userInfo?.email || 'Guest';
+  const avatarInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
@@ -180,13 +204,22 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Typography>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <VirtualCharacter size="sm" animation="idle" />
-            <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main' }}>
-              P
-            </Avatar>
-            <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-              Parent User
-            </Typography>
+            {loading ? (
+              <CircularProgress size={20} color="primary" />
+            ) : error ? (
+              <Typography variant="body2" color="error" sx={{ fontWeight: 500 }}>
+                {error}
+              </Typography>
+            ) : (
+              <>
+                <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontWeight: 600 }}>
+                  {avatarInitial}
+                </Avatar>
+                <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' }, fontWeight: 500 }}>
+                  {displayName}
+                </Typography>
+              </>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
@@ -209,7 +242,6 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         >
           {drawerContent}
         </Drawer>
-
         {/* Desktop drawer */}
         <Drawer
           variant="persistent"
