@@ -23,10 +23,8 @@ import {
   Security,
   Notifications,
   Language,
-  Palette,
   ChildCare,
 } from "@mui/icons-material";
-import VirtualCharacter from "../../components/VirtualCharacter";
 import { authAPI, usersAPI } from "../../services/api";
 import { GetUserDetailsResponse, UpdateUserRequest } from "../../types/api";
 

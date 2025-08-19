@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
-import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   AppBar,
@@ -18,6 +19,7 @@ import {
   useMediaQuery,
   useTheme,
   CircularProgress,
+  Stack,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -25,10 +27,10 @@ import {
   ChildCare,
   Person,
   Logout,
-  ChevronLeft,
 } from "@mui/icons-material";
 import { authAPI } from "../../services/api";
 import Logo from "../../assets/chatbot.png";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const drawerWidth = 280;
 
@@ -52,7 +54,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         if (response.data.status_message === "SUCCESS") {
           setUserInfo(response.data.data);
         } else {
-          setError(response.data || "Failed to fetch user info");
+          setError(response.data.data.name || "Failed to fetch user info");
         }
       } catch (err: any) {
         setError(err.response?.data?.message || "Error fetching user info");
@@ -83,7 +85,14 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   ];
 
   const drawerContent = (
-    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <Box
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "#002979",
+      }}
+    >
       {/* Header */}
       <Box sx={{ p: 2 }}>
         <Box className="flex items-center justify-between">
@@ -92,7 +101,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           </Box>
           {!isMobile && (
             <IconButton onClick={handleDrawerToggle} sx={{ color: "white" }}>
-              <ChevronLeft />
+              <KeyboardDoubleArrowLeftIcon style={{ color: "#fff" }} />
             </IconButton>
           )}
         </Box>
@@ -116,10 +125,9 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     borderRadius: "8px",
                     backgroundColor:
                       location.pathname === item.path
-                        ? "primary.main"
+                        ? "#2A58AD"
                         : "transparent",
-                    color:
-                      location.pathname === item.path ? "#FFFFFF" : "#212121",
+                    color: "#fff",
                     "&:hover": {
                       backgroundColor:
                         location.pathname === item.path
@@ -141,7 +149,10 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                   </ListItemIcon>
                   <ListItemText
                     primary={item.text}
-                    primaryTypographyProps={{ fontWeight: "medium" }}
+                    primaryTypographyProps={{
+                      fontWeight: "400",
+                      color: "#efefef",
+                    }}
                   />
                 </ListItemButton>
               </ListItem>
@@ -160,17 +171,19 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 borderRadius: "12px",
                 color: "error.main",
                 "&:hover": {
-                  backgroundColor: "error.light",
+                  backgroundColor: "#2A58AD",
                   color: "error.contrastText",
                 },
               }}
             >
-              <ListItemIcon sx={{ color: "inherit", minWidth: "40px" }}>
+              <ListItemIcon
+                sx={{ color: "primary.contrastText", minWidth: "40px" }}
+              >
                 <Logout />
               </ListItemIcon>
               <ListItemText
                 primary="Logout"
-                primaryTypographyProps={{ fontWeight: "medium" }}
+                primaryTypographyProps={{ fontWeight: "400", color: "#fff" }}
               />
             </ListItemButton>
           </ListItem>
@@ -180,6 +193,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 
   const displayName = userInfo?.name || userInfo?.email || "Guest";
+  const displayEmail = userInfo?.email || "xyz@gmail.com";
   const avatarInitial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -235,20 +249,35 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               <>
                 <Avatar
                   sx={{
-                    width: 32,
-                    height: 32,
-                    bgcolor: "primary.main",
+                    width: 44,
+                    height: 44,
+                    bgcolor: "#002979",
                     fontWeight: 600,
                   }}
                 >
                   {avatarInitial}
                 </Avatar>
-                <Typography
-                  variant="body2"
-                  sx={{ display: { xs: "none", sm: "block" }, fontWeight: 500 }}
-                >
-                  {displayName}
-                </Typography>
+                <Stack>
+                  <Typography
+                    fontSize={"16px"}
+                    sx={{
+                      display: { xs: "none", sm: "block" },
+                      fontWeight: 500,
+                    }}
+                  >
+                    {displayName}
+                  </Typography>
+                  <Typography
+                    fontSize={"12px"}
+                    color="textDisabled"
+                    sx={{
+                      display: { xs: "none", sm: "block" },
+                      fontWeight: 500,
+                    }}
+                  >
+                    {displayEmail}
+                  </Typography>
+                </Stack>
               </>
             )}
           </Box>
